@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
-import { cdnSrc, onCdnError } from "@/lib/cdn-image";
 
 const ROUTE_MAP_DE_EN = {
   "leistungen": "services",
@@ -12,9 +11,14 @@ const ROUTE_MAP_DE_EN = {
 };
 const ROUTE_MAP_EN_DE = Object.fromEntries(Object.entries(ROUTE_MAP_DE_EN).map(([k, v]) => [v, k]));
 
+// Markenlogo auf dem eigenen Server. Die Vorlage lud dafuer zwei PNG von
+// 510 KB fuer eine Flaeche von 122x63 Pixeln. Beide Fassungen sind aus der
+// gelieferten AVIF-Datei abgeleitet: Deckkraft aus der Helligkeit, damit der
+// weisse Hintergrund verschwindet, und die blaue Fassung in der Farbe, die in
+// der Datei steht. Zusammen 16 KB.
 // Uploaded brand logos: white variant for dark backgrounds, blue variant for light backgrounds.
-const LOGO_WHITE = "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/287789357_Codex-Bild21Sept202614_48_13.png";
-const LOGO_BLUE = "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/26a6f1bfc_Codex-Bild21Sept202614_48_00.png";
+const LOGO_WHITE = "/media/logo-weiss-256w.webp";
+const LOGO_BLUE = "/media/logo-blau-256w.webp";
 
 // Theme of the section currently behind the fixed header. The hero (no id) is dark.
 const SECTION_THEME = {
@@ -102,7 +106,7 @@ export default function Header() {
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 h-full">
         <div className="flex items-center justify-between h-full">
           <Link to={home} className="flex items-center gap-2.5 group" aria-label="Elektrotechnik Krasniqi">
-            <img src={cdnSrc(logoSrc, 256, 80)} onError={onCdnError(logoSrc)} alt="" width="122" height="63" className="h-9 w-auto" />
+            <img src={logoSrc} alt="" width="122" height="63" decoding="async" className="h-9 w-auto" />
             <span className={`font-heading font-semibold text-[15px] tracking-tight ${textColor}`}>Elektrotechnik Krasniqi</span>
           </Link>
 

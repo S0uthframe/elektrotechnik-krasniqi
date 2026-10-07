@@ -159,6 +159,34 @@ Höhe — um etwa den Faktor zwanzig zu groß. Auf Wunsch des Auftraggebers ist 
 samt der Lade-Mechanik aus dem Laufband genommen; die Vorlage zeigte dort ein
 Video zwischen neun Fotos. Das Laufband läuft jetzt mit neun Bildern.
 
+**Vierter Durchgang — Bilder vom CDN auf den eigenen Server.** Die
+Originaldateien liegen jetzt unter `medien-original/`,
+`tools/bilder_rechnen.py` rechnet daraus die ausgelieferten Fassungen nach
+`public/media/`.
+
+Der Vergleich rechtfertigt den Schritt für sich: Dasselbe dunkle Hero-Bild wog
+über das Bild-CDN **579 KB**, hier kodiert wiegt es **38 KB**. Ursache ist die
+Nachschärfung (`usm`) in der CDN-Adresse zusammen mit `quality_auto` — von
+außen nicht abstellbar.
+
+| Was | vorher (CDN) | jetzt (lokal) |
+|---|---|---|
+| Hero dunkel, volle Breite | 579 KB | 38 KB |
+| Hero hell, volle Breite | — | 65 KB |
+| Logo, beide Fassungen | 510 KB je PNG | 16 KB zusammen |
+| Neun Laufbandbilder, je zwei Stufen | ~1 MB | 480 KB |
+
+Dazu: Die 48-Pixel-Vorstufen liegen jetzt als data-URI im Code und in der
+`index.html` — sechs Kilobyte für alle elf Bilder, und kein einziger Netzabruf
+mehr dafür.
+
+**Das Logo** kam als AVIF ohne Alphakanal, also mit weißem Hintergrund. Beide
+Fassungen sind daraus abgeleitet: Die Deckkraft stammt aus der Helligkeit, was
+die weichen Kanten erhält, wo ein harter Schwellenwert einen hellen Saum
+hinterlassen hätte. Die blaue Fassung trägt die Farbe, die in der Datei steht
+(`#014378`), nicht eine geschätzte. Geprüft wurde nicht nach Augenmaß, sondern
+am gerenderten Pixelwert.
+
 ### Nicht behoben, mit Begründung
 
 - **`text-navy/45` bis `/60` auf Weiß** (Kontaktlabels, Bildunterschriften,
@@ -170,11 +198,15 @@ Video zwischen neun Fotos. Das Laufband läuft jetzt mit neun Bildern.
 - **Fehlende `width`/`height` an den Laufband-Bildern.** Die Maße der
   Originaldateien sind von hier nicht abrufbar; geratene Werte würden die
   Bilder verzerren.
-- **Die Quelldateien der Hero-Bilder.** Sie sind der eigentliche Engpass:
-  rauschreiche Renderings, die auch als WebP schwer bleiben. Sauber gelöst wäre
-  das mit besseren Ausgangsdateien — ein ruhigeres Motiv oder eine Fassung, die
-  für Webgrößen gerechnet ist. Alles hier Beschriebene arbeitet um diese
-  Eigenschaft herum.
+- **Neun Bilder hängen weiter am Base44-CDN**, weil ihre Originaldateien
+  fehlen: das mobile Hero-Bild (`hell-mobile.png`) und die acht Bilder der
+  Leistungsliste (`elektro-krasniqi-verteilerkasten-gross.jpg`,
+  `elektro-krasniqi-verteilerkasten.jpg`, `elektro-krasniqi-verteiler.jpg`,
+  `elektro-krasniqi-solardach.jpg`, `elektro-krasniqi-buero.jpg` sowie zweimal
+  `generated_image.png`). Sobald sie in `medien-original/` liegen, erledigt
+  `tools/bilder_rechnen.py` den Rest. Achtung bei den beiden `generated_image.png`:
+  Sie tragen denselben Namen und unterscheiden sich nur im Hash der CDN-Adresse —
+  sie müssen beim Hochladen unterscheidbar benannt werden.
 - **42 KB ungenutztes JavaScript.** Aufteilbar, indem `framer-motion` nur für
   den Hero nachgeladen wird. Das verzögert aber genau die Animation, die als
   erstes sichtbar ist.

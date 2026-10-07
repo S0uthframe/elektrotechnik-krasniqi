@@ -1,6 +1,6 @@
 import React from "react";
 import { useI18n } from "@/lib/i18n";
-import { cdnSrc, onCdnError } from "@/lib/cdn-image";
+import { SOFORTBILDER } from "@/lib/sofortbilder";
 
 export default function ProjectsMarquee() {
   const { t } = useI18n();
@@ -27,8 +27,9 @@ export default function ProjectsMarquee() {
           {loop.map((it, i) => (
             <figure key={i} className="shrink-0 mr-3">
               <img
-                src={cdnSrc(it.src, 720)}
-                onError={onCdnError(it.src)}
+                src={`/media/${it.src}-600h.webp`}
+                srcSet={`/media/${it.src}-300h.webp 1x, /media/${it.src}-600h.webp 2x`}
+                style={{ backgroundImage: `url(${SOFORTBILDER[it.src]})`, backgroundSize: "cover" }}
                 alt={it.alt}
                 loading="lazy"
                 decoding="async"

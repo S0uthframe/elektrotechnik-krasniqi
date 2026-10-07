@@ -3,10 +3,16 @@ import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion
 import { Phone, ChevronDown } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { cdnSrc, onCdnError } from "@/lib/cdn-image";
+import { SOFORTBILDER } from "@/lib/sofortbilder";
 import HeroCtaButton from "@/components/HeroCtaButton";
 
-const HERO_DESKTOP = "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/ca03c90ed_Codex-Bild21Sept202614_43_58.png";
-const DARK_DESKTOP = "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/b8afcdfb2_Codex-Bild21Sept202614_48_20.png";
+// Die beiden Desktop-Fassungen liegen auf dem eigenen Server
+// (public/media, erzeugt von tools/bilder_rechnen.py). Das mobile Bild haengt
+// noch am CDN: seine Originaldatei (hell-mobile.png) fehlt bislang.
+const HERO_DESKTOP = "hero-desktop-hell";
+const DARK_DESKTOP = "hero-desktop-dunkel";
+const hero = (name, breite) => `/media/${name}-${breite}w.webp`;
+const heroSatz = (name) => `${hero(name, 1280)} 1280w, ${hero(name, 1672)} 1672w`;
 const BRIGHT_MOBILE = "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/02b490829_hell-mobile.png";
 
 const PHONE_HREF = "tel:+491604141186";
@@ -29,15 +35,15 @@ const PHONE_HREF = "tel:+491604141186";
 const Q_SOFORT = { breite: 48, qualitaet: 40 };
 const Q_DUNKEL_MOBIL = { breite: 900, qualitaet: 38 };
 const Q_HELL_MOBIL = { breite: 900, qualitaet: 62 };
-const Q_DUNKEL_DESKTOP = { breite: 1600, qualitaet: 60 };
-const Q_HELL_DESKTOP = { breite: 1600, qualitaet: 75 };
 
 // Unscharfes Sofortbild. aria-hidden, weil es nur eine Vorstufe desselben
 // Motivs ist und Screenreadern nichts Zusaetzliches sagt.
 function Sofortbild({ src, position }) {
+  // Lokale Bilder bringen ihre Vorstufe als data-URI mit — kein Netzabruf.
+  const quelle = SOFORTBILDER[src] || cdnSrc(src, Q_SOFORT.breite, Q_SOFORT.qualitaet);
   return (
     <img
-      src={cdnSrc(src, Q_SOFORT.breite, Q_SOFORT.qualitaet)}
+      src={quelle}
       alt=""
       aria-hidden="true"
       className={`absolute inset-0 h-full w-full object-cover ${position}`}
@@ -146,8 +152,9 @@ export default function HeroScroll() {
             {/* Bright base image — erst nach dem dunklen, damit es nicht aufblitzt */}
             {(!showDark || darkLoaded) && (
               <img
-                src={cdnSrc(HERO_DESKTOP, Q_HELL_DESKTOP.breite, Q_HELL_DESKTOP.qualitaet)}
-                onError={onCdnError(HERO_DESKTOP)}
+                src={hero(HERO_DESKTOP, 1672)}
+                srcSet={heroSatz(HERO_DESKTOP)}
+                sizes="100vw"
                 alt={t.hero.visualNote}
                 fetchPriority={showDark ? "low" : "high"}
                 decoding="async"
@@ -157,15 +164,12 @@ export default function HeroScroll() {
             {/* Dark copy on top — clipped away from bottom up as you scroll */}
             {showDark && (
               <motion.img
-                src={cdnSrc(DARK_DESKTOP, Q_DUNKEL_DESKTOP.breite, Q_DUNKEL_DESKTOP.qualitaet)}
-                onError={(event) => {
-                  // Erster Fehlschlag: auf die Originaldatei zurueckfallen.
-                  // Scheitert auch die, das helle Bild trotzdem freigeben —
-                  // sonst bliebe die Hero-Flaeche dauerhaft leer.
-                  const vorher = event.currentTarget.src;
-                  onCdnError(DARK_DESKTOP)(event);
-                  if (event.currentTarget.src === vorher) setDarkLoaded(true);
-                }}
+                src={hero(DARK_DESKTOP, 1672)}
+                srcSet={heroSatz(DARK_DESKTOP)}
+                sizes="100vw"
+                // Faellt das dunkle Bild aus, das helle trotzdem freigeben —
+                // sonst bliebe die Hero-Flaeche dauerhaft leer.
+                onError={() => setDarkLoaded(true)}
                 onLoad={() => setDarkLoaded(true)}
                 alt=""
                 aria-hidden="true"
