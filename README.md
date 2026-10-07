@@ -154,6 +154,11 @@ bricht ab, wenn das CSS über 60 KB wächst. Die Vorverbindung zu
 `media.base44.com` ist entfallen: Die Preloads öffnen die Verbindung bereits
 selbst, der Hinweis blieb im Bericht ungenutzt.
 
+**Projektvideo entfernt.** Die Datei wog 7,5 MB für eine Kachel von 288 px
+Höhe — um etwa den Faktor zwanzig zu groß. Auf Wunsch des Auftraggebers ist sie
+samt der Lade-Mechanik aus dem Laufband genommen; die Vorlage zeigte dort ein
+Video zwischen neun Fotos. Das Laufband läuft jetzt mit neun Bildern.
+
 ### Nicht behoben, mit Begründung
 
 - **`text-navy/45` bis `/60` auf Weiß** (Kontaktlabels, Bildunterschriften,
@@ -173,11 +178,6 @@ selbst, der Hinweis blieb im Bericht ungenutzt.
 - **42 KB ungenutztes JavaScript.** Aufteilbar, indem `framer-motion` nur für
   den Hero nachgeladen wird. Das verzögert aber genau die Animation, die als
   erstes sichtbar ist.
-- **Das Projektvideo (7,5 MB).** Es liegt nicht mehr im Ladeweg — angefordert
-  wird es erst bei Sichtkontakt mit dem Laufband. Wer dorthin scrollt, lädt es
-  aber weiterhin. Die saubere Lösung ist, die Datei neu zu kodieren: 7,5 MB für
-  eine Kachel von 288 px Höhe sind um etwa den Faktor zwanzig zu groß. Bis
-  dahin bleibt es eine bewusste Abwägung zwischen Inhalt und Datenvolumen.
 - **Erzwungener dynamischer Umbruch (64 ms).** Die Bildkomponente der Vorlage
   misst ihren Container mit `getBoundingClientRect`, um die passende Bildgröße
   anzufordern. Das ist der Preis dieser Technik; ihn zu vermeiden hieße, die

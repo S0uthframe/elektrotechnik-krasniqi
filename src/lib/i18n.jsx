@@ -178,7 +178,6 @@ export const translations = {
         { src: "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/545164cbd_PHOTO-2026-10-02-17-55-576.jpg", alt: "Innenraum mit LED-Lichtbahnen", caption: "Beleuchtung" },
         { src: "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/dae2b6915_PHOTO-2026-10-02-18-29-04.jpg", alt: "Lichtmast für gewerbliche Außenbeleuchtung", caption: "Lichtmasten" },
         { src: "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/86c5fb369_PHOTO-2026-10-02-17-55-575.jpg", alt: "Außenanlage in der Dämmerung", caption: "Außenanlage" },
-        { video: "https://media.base44.com/videos/public/6ab1017905a6126f39abd0a8/08ee2aae2_VIDEO-2026-10-02-17-35-35.mp4", alt: "Photovoltaik-Installation", caption: "Photovoltaik" },
       ],
     },
     reviews: {
@@ -443,7 +442,6 @@ export const translations = {
         { src: "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/545164cbd_PHOTO-2026-10-02-17-55-576.jpg", alt: "Interior with LED light tracks", caption: "Lighting" },
         { src: "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/dae2b6915_PHOTO-2026-10-02-18-29-04.jpg", alt: "Light mast for commercial outdoor lighting", caption: "Light masts" },
         { src: "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/86c5fb369_PHOTO-2026-10-02-17-55-575.jpg", alt: "Outdoor area at dusk", caption: "Outdoor" },
-        { video: "https://media.base44.com/videos/public/6ab1017905a6126f39abd0a8/08ee2aae2_VIDEO-2026-10-02-17-35-35.mp4", alt: "Solar installation", caption: "Solar" },
       ],
     },
     reviews: {
