@@ -114,6 +114,17 @@ Umwandlung fehl, lädt `onCdnError` die Originaldatei nach — schlimmstenfalls
 bleibt es also beim bisherigen Zustand, ein Bild fehlt nicht. Der erste Test
 auf dem Server zeigt es an der Dateigröße des Hero-Bildes.
 
+**Zweiter Durchgang.** Nach dem ersten lag die Seite bei rund 1,2 MB Bildern.
+
+| Befund | Behebung |
+|---|---|
+| Helles Hero-Bild blitzte beim Laden auf, bevor das dunkle es überdeckte | Die Ladereihenfolge war falsch herum: Zu Beginn der Animation ist ausschließlich das dunkle Bild zu sehen, Preload und hohe Priorität lagen aber auf dem hellen. Jetzt lädt das dunkle zuerst, das helle wird erst eingehängt, wenn das dunkle geladen ist. Scheitern beide Adressen des dunklen Bildes, wird das helle trotzdem freigegeben — sonst bliebe die Fläche leer. |
+| Mobiles Hero-Bild 976 KB | `w_1200,q_85` → `w_960,q_75`. Angezeigt werden laut Bericht 960×699. |
+| Leistungsbilder 117 KB und 62 KB | Die Bildkomponente stand auf Qualität 90, jetzt 80. |
+| Logo 18 KB | `w_320,q_85` → `w_256,q_80`; deckt doppelte Pixeldichte ab. |
+| Vorverbindung „nicht verwendet" | `crossorigin` entfernt. Die Bilder werden ohne CORS geladen; mit dem Attribut öffnet der Browser einen zweiten, ungenutzten Verbindungskanal. |
+| Dunkles Hero-Bild bei abgeschalteter Animation | Wird gar nicht mehr angefordert — sichtbar ist es in diesem Fall nie. |
+
 ### Nicht behoben, mit Begründung
 
 - **`text-navy/45` bis `/60` auf Weiß** (Kontaktlabels, Bildunterschriften,
@@ -128,6 +139,15 @@ auf dem Server zeigt es an der Dateigröße des Hero-Bildes.
 - **42 KB ungenutztes JavaScript.** Aufteilbar, indem `framer-motion` nur für
   den Hero nachgeladen wird. Das verzögert aber genau die Animation, die als
   erstes sichtbar ist.
+- **Das Projektvideo (7,5 MB).** Es liegt nicht mehr im Ladeweg — angefordert
+  wird es erst bei Sichtkontakt mit dem Laufband. Wer dorthin scrollt, lädt es
+  aber weiterhin. Die saubere Lösung ist, die Datei neu zu kodieren: 7,5 MB für
+  eine Kachel von 288 px Höhe sind um etwa den Faktor zwanzig zu groß. Bis
+  dahin bleibt es eine bewusste Abwägung zwischen Inhalt und Datenvolumen.
+- **Erzwungener dynamischer Umbruch (64 ms).** Die Bildkomponente der Vorlage
+  misst ihren Container mit `getBoundingClientRect`, um die passende Bildgröße
+  anzufordern. Das ist der Preis dieser Technik; ihn zu vermeiden hieße, die
+  Komponente zu ersetzen.
 - **`llms.txt`.** Google unterstützt die Datei nach eigener Aussage nicht, kein
   großer Anbieter hat produktive Nutzung zugesagt. Eine Datei anzulegen, damit
   ein Prüfwerkzeug grün wird, ist kein Grund. Der eigentliche Fehler — HTML mit

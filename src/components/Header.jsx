@@ -102,7 +102,7 @@ export default function Header() {
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 h-full">
         <div className="flex items-center justify-between h-full">
           <Link to={home} className="flex items-center gap-2.5 group" aria-label="Elektrotechnik Krasniqi">
-            <img src={cdnSrc(logoSrc, 320)} onError={onCdnError(logoSrc)} alt="" width="122" height="63" className="h-9 w-auto" />
+            <img src={cdnSrc(logoSrc, 256, 80)} onError={onCdnError(logoSrc)} alt="" width="122" height="63" className="h-9 w-auto" />
             <span className={`font-heading font-semibold text-[15px] tracking-tight ${textColor}`}>Elektrotechnik Krasniqi</span>
           </Link>
 

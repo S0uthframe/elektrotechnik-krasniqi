@@ -28,6 +28,7 @@ export default function ServicesList() {
                   src={item.image}
                   alt={item.alt}
                   fittingType="fill"
+                  quality={80}
                   className="block w-full aspect-[4/3] rounded-xl overflow-hidden"
                 />
               </div>

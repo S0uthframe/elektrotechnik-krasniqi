@@ -41,6 +41,16 @@ export default function HeroScroll() {
   const { t } = useI18n();
   const reduce = useReducedMotion();
   const isDesktop = useIsDesktop();
+  // Beim Seitenaufbau stand zuerst das helle Bild und wurde dann vom dunklen
+  // ueberdeckt — sichtbar als Aufblitzen. Ursache war die Ladereihenfolge: Das
+  // helle Bild liegt unten, bekam aber die hohe Prioritaet und den Preload,
+  // obwohl zu Beginn der Animation ausschliesslich das dunkle zu sehen ist.
+  // Jetzt laedt das dunkle zuerst; das helle kommt erst danach und damit
+  // unbemerkt hinter der dunklen Flaeche.
+  const [darkLoaded, setDarkLoaded] = useState(false);
+  // Ohne Animation (prefers-reduced-motion) wird die dunkle Fassung nie
+  // gezeigt. Sie dann gar nicht erst zu laden spart eine ganze Bilddatei.
+  const showDark = !reduce;
   const sectionRef = useRef(null);
   const [glowSignal, setGlowSignal] = useState(0);
   const [borderEnabled, setBorderEnabled] = useState(false);
@@ -97,24 +107,38 @@ export default function HeroScroll() {
         <div className="relative h-full">
           {/* Image area starts below the header so the full roofline stays visible */}
           <div className="absolute top-20 inset-x-0 bottom-0 overflow-hidden">
-            {/* Bright base image */}
-            <img
-              src={cdnSrc(HERO_DESKTOP, 1920)}
-              onError={onCdnError(HERO_DESKTOP)}
-              alt={t.hero.visualNote}
-              fetchPriority="high"
-              decoding="async"
-              className="absolute inset-0 h-full w-full object-cover object-top"
-            />
+            {/* Bright base image — erst nach dem dunklen, damit es nicht aufblitzt */}
+            {(!showDark || darkLoaded) && (
+              <img
+                src={cdnSrc(HERO_DESKTOP, 1600)}
+                onError={onCdnError(HERO_DESKTOP)}
+                alt={t.hero.visualNote}
+                fetchPriority={showDark ? "low" : "high"}
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-cover object-top"
+              />
+            )}
             {/* Dark copy on top — clipped away from bottom up as you scroll */}
-            <motion.img
-              src={cdnSrc(DARK_DESKTOP, 1920)}
-              onError={onCdnError(DARK_DESKTOP)}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 h-full w-full object-cover object-top"
-              style={{ clipPath: reduce ? "inset(100% 0% 0% 0%)" : clip, WebkitClipPath: reduce ? "inset(100% 0% 0% 0%)" : clip }}
-            />
+            {showDark && (
+              <motion.img
+                src={cdnSrc(DARK_DESKTOP, 1600)}
+                onError={(event) => {
+                  // Erster Fehlschlag: auf die Originaldatei zurueckfallen.
+                  // Scheitert auch die, das helle Bild trotzdem freigeben —
+                  // sonst bliebe die Hero-Flaeche dauerhaft leer.
+                  const vorher = event.currentTarget.src;
+                  onCdnError(DARK_DESKTOP)(event);
+                  if (event.currentTarget.src === vorher) setDarkLoaded(true);
+                }}
+                onLoad={() => setDarkLoaded(true)}
+                alt=""
+                aria-hidden="true"
+                fetchPriority="high"
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-cover object-top"
+                style={{ clipPath: clip, WebkitClipPath: clip }}
+              />
+            )}
           </div>
           <div className="relative z-10 mx-auto max-w-[1280px] px-10 h-full flex items-center">
             <div className="max-w-[480px]">
@@ -151,7 +175,7 @@ export default function HeroScroll() {
             <div className="relative h-[40svh] min-h-[220px] max-h-[300px] overflow-hidden">
               {/* Bright base image */}
               <img
-                src={cdnSrc(BRIGHT_MOBILE, 1200)}
+                src={cdnSrc(BRIGHT_MOBILE, 960, 75)}
                 onError={onCdnError(BRIGHT_MOBILE)}
                 alt={t.hero.visualNote}
                 fetchPriority="high"
@@ -160,7 +184,7 @@ export default function HeroScroll() {
               />
               {/* Dark copy on top — clipped away from bottom up as you scroll */}
               <motion.img
-                src={cdnSrc(BRIGHT_MOBILE, 1200)}
+                src={cdnSrc(BRIGHT_MOBILE, 960, 75)}
                 onError={onCdnError(BRIGHT_MOBILE)}
                 alt=""
                 aria-hidden="true"
