@@ -203,6 +203,18 @@ Das entscheidende Element bleibt aber das mobile Hero-Bild, das als einziges
 noch am CDN hängt. Solange seine Originaldatei fehlt, ist der Wert nicht
 weiter zu drücken.
 
+**Korrektur am mobilen Hero.** Auf dem Handy gibt es nur ein Bild — die dunkle
+Ebene ist dieselbe Datei, per CSS auf 34 % Helligkeit gedimmt. In einem
+früheren Durchgang hatte ich daraus zwei Dateien gemacht: eine stärker
+komprimierte für die dunkle Ebene, in der Annahme, Artefakte seien bei 34 %
+Helligkeit unsichtbar. Das stimmt, war aber trotzdem falsch — es machte aus
+einem Download zwei desselben Fotos. Der kleinere LCP-Kandidat war den
+doppelten Datenverbrauch nicht wert.
+
+Beide Ebenen zeigen wieder auf dieselbe Adresse (`q_58`), der Browser lädt die
+Datei einmal. Nachgemessen bei 390 Pixeln Breite: zwei CDN-Abrufe beim
+Seitenaufbau statt elf vor den letzten beiden Korrekturen.
+
 ### Nicht behoben, mit Begründung
 
 - **`text-navy/45` bis `/60` auf Weiß** (Kontaktlabels, Bildunterschriften,

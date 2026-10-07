@@ -26,15 +26,17 @@ const PHONE_HREF = "tel:+491604141186";
 //    Sie ist nach dem ersten Netzabruf da und fuellt die Flaeche, bis das
 //    richtige Bild steht. Das ist dieselbe Technik, die die Bildkomponente der
 //    Vorlage an anderen Stellen bereits verwendet.
-// 2. Die dunkle Ebene auf dem Handy ist dieselbe Datei, nur per CSS auf 34 %
-//    Helligkeit gedimmt. Kompressionsartefakte sieht dort niemand, also bekommt
-//    sie eine eigene, deutlich staerker komprimierte Fassung. Sie ist das
-//    LCP-Element — und damit das, was zaehlt.
-// 3. Die helle Ebene wird erst danach geladen; sichtbar wird sie ohnehin erst
-//    beim Scrollen.
+// 2. Auf dem Handy gibt es nur EIN Bild: Die dunkle Ebene ist dieselbe Datei,
+//    per CSS auf 34 % Helligkeit gedimmt. Beide Ebenen zeigen deshalb auf
+//    dieselbe Adresse — der Browser laedt die Datei einmal.
+//
+//    Zwischenzeitlich stand hier eine staerker komprimierte Fassung fuer die
+//    dunkle Ebene, in der Annahme, Artefakte seien bei 34 % Helligkeit
+//    unsichtbar. Das stimmt zwar, war aber trotzdem falsch: Es machte aus
+//    einem Download zwei desselben Fotos. Der kleinere LCP-Kandidat war den
+//    doppelten Datenverbrauch nicht wert.
 const Q_SOFORT = { breite: 48, qualitaet: 40 };
-const Q_DUNKEL_MOBIL = { breite: 900, qualitaet: 38 };
-const Q_HELL_MOBIL = { breite: 900, qualitaet: 62 };
+const Q_MOBIL = { breite: 900, qualitaet: 58 };
 
 // Unscharfes Sofortbild. aria-hidden, weil es nur eine Vorstufe desselben
 // Motivs ist und Screenreadern nichts Zusaetzliches sagt.
@@ -92,6 +94,7 @@ export default function HeroScroll() {
   // Ohne Animation (prefers-reduced-motion) wird die dunkle Fassung nie
   // gezeigt. Sie dann gar nicht erst zu laden spart eine ganze Bilddatei.
   const showDark = !reduce;
+  const mobilQuelle = cdnSrc(BRIGHT_MOBILE, Q_MOBIL.breite, Q_MOBIL.qualitaet);
   const sectionRef = useRef(null);
   const [glowSignal, setGlowSignal] = useState(0);
   const [borderEnabled, setBorderEnabled] = useState(false);
@@ -214,30 +217,25 @@ export default function HeroScroll() {
             {/* Building image — own area, not a background */}
             <div className="relative h-[40svh] min-h-[220px] max-h-[300px] overflow-hidden">
               <Sofortbild src={BRIGHT_MOBILE} position="object-center" />
-              {/* Bright base image — erst nach der dunklen Ebene */}
-              {(!showDark || darkLoaded) && (
-                <img
-                  src={cdnSrc(BRIGHT_MOBILE, Q_HELL_MOBIL.breite, Q_HELL_MOBIL.qualitaet)}
-                  onError={onCdnError(BRIGHT_MOBILE)}
-                  alt={t.hero.visualNote}
-                  fetchPriority={showDark ? "low" : "high"}
-                  decoding="async"
-                  className="absolute inset-0 h-full w-full object-cover object-center"
-                />
-              )}
-              {/* Dark copy on top — clipped away from bottom up as you scroll */}
+              {/* Beide Ebenen, eine Datei: der Browser laedt sie einmal. Kein
+                  Aufblitzen moeglich, weil nichts nacheinander ankommt. */}
+              <img
+                src={mobilQuelle}
+                onError={onCdnError(BRIGHT_MOBILE)}
+                alt={t.hero.visualNote}
+                fetchPriority="high"
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-cover object-center"
+              />
+              {/* Dunkle Ebene — beim Scrollen von unten weggeschnitten */}
               {showDark && (
                 <motion.img
-                  src={cdnSrc(BRIGHT_MOBILE, Q_DUNKEL_MOBIL.breite, Q_DUNKEL_MOBIL.qualitaet)}
-                  onError={(event) => {
-                    const vorher = event.currentTarget.src;
-                    onCdnError(BRIGHT_MOBILE)(event);
-                    if (event.currentTarget.src === vorher) setDarkLoaded(true);
-                  }}
-                  onLoad={() => setDarkLoaded(true)}
+                  src={mobilQuelle}
+                  // Gleicher Rueckfall wie die helle Ebene: Beide muessen
+                  // dieselbe Datei zeigen, sonst passt der Beschnitt nicht.
+                  onError={onCdnError(BRIGHT_MOBILE)}
                   alt=""
                   aria-hidden="true"
-                  fetchPriority="high"
                   decoding="async"
                   className="absolute inset-0 h-full w-full object-cover object-center"
                   style={{ filter: "brightness(0.34) saturate(0.85)", clipPath: clip, WebkitClipPath: clip }}
