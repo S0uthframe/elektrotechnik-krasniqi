@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import Logo, { LOGO_FARBE } from "@/components/Logo";
 
 const ROUTE_MAP_DE_EN = {
   "leistungen": "services",
@@ -11,14 +12,6 @@ const ROUTE_MAP_DE_EN = {
 };
 const ROUTE_MAP_EN_DE = Object.fromEntries(Object.entries(ROUTE_MAP_DE_EN).map(([k, v]) => [v, k]));
 
-// Markenlogo auf dem eigenen Server. Die Vorlage lud dafuer zwei PNG von
-// 510 KB fuer eine Flaeche von 122x63 Pixeln. Beide Fassungen sind aus der
-// gelieferten AVIF-Datei abgeleitet: Deckkraft aus der Helligkeit, damit der
-// weisse Hintergrund verschwindet, und die blaue Fassung in der Farbe, die in
-// der Datei steht. Zusammen 16 KB.
-// Uploaded brand logos: white variant for dark backgrounds, blue variant for light backgrounds.
-const LOGO_WHITE = "/media/logo-weiss-256w.webp";
-const LOGO_BLUE = "/media/logo-blau-256w.webp";
 
 // Theme of the section currently behind the fixed header. The hero (no id) is dark.
 const SECTION_THEME = {
@@ -95,7 +88,6 @@ export default function Header() {
   const langInactive = overDark ? "text-navy/65 hover:text-navy" : "text-white/50 hover:text-white";
   const langSep = overDark ? "text-navy/30" : "text-white/30";
   const menuIcon = overDark ? "text-navy" : "text-white";
-  const logoSrc = overDark ? LOGO_BLUE : LOGO_WHITE;
   const bg = overDark ? "rgba(255,255,255,0.92)" : "rgba(8,31,48,0.92)";
 
   return (
@@ -106,7 +98,7 @@ export default function Header() {
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 h-full">
         <div className="flex items-center justify-between h-full">
           <Link to={home} className="flex items-center gap-2.5 group" aria-label="Elektrotechnik Krasniqi">
-            <img src={logoSrc} alt="" width="122" height="63" decoding="async" className="h-9 w-auto" />
+            <Logo className="h-9 w-auto" style={overDark ? { color: LOGO_FARBE } : { color: "#ffffff" }} />
             <span className={`font-heading font-semibold text-[15px] tracking-tight ${textColor}`}>Elektrotechnik Krasniqi</span>
           </Link>
 

@@ -215,6 +215,29 @@ Beide Ebenen zeigen wieder auf dieselbe Adresse (`q_58`), der Browser lädt die
 Datei einmal. Nachgemessen bei 390 Pixeln Breite: zwei CDN-Abrufe beim
 Seitenaufbau statt elf vor den letzten beiden Korrekturen.
 
+**Messwerte statt Vermutung.** Der Bericht beziffert das mobile Hero-Bild auf
+**433,5 KB** bei `w_900,q_58`, mit geschätzten 372 KB Einsparpotenzial allein
+durch bessere Komprimierung. Damit ist belegt, was der Desktop-Vergleich
+nahelegte: Nicht die Vorlagen sind zu schwer, sondern das Bild-CDN liefert sie
+zu schwer aus. Lokal gerechnet liegen vergleichbare Motive bei 38 bis 65 KB.
+
+**Das Logo ist jetzt ein Vektor.** Die bisherige Bitmap-Fassung wog 10,6 KB und
+war bei hoher Pixeldichte unscharf; der Bericht bemängelte zusätzlich die
+gelieferten Maße. Aus der AVIF-Datei nachgezeichnet (potrace) wiegt die Marke
+3,2 KB, ist bei jeder Größe scharf und steckt als Komponente
+(`src/components/Logo.jsx`) inline im Code — ein Netzabruf weniger, und die
+Farbe kommt per `currentColor` aus der Kopfleiste statt aus zwei getrennten
+Dateien. Gemessen am gerenderten Pixelwert: 5.765 Pixel in exakt `#014378`.
+
+Lighthouse forderte außerdem, das Logo kleiner auszuliefern (122×63 angezeigt,
+256×132 geliefert). Dem folgt die Vektorfassung nicht buchstäblich, sondern
+löst die Ursache: Bei einem Vektor gibt es keine gelieferte Pixelgröße mehr.
+Die 256 Pixel waren im Übrigen kein Fehler, sondern die Deckung doppelter
+Pixeldichte — Lighthouse rechnet an dieser Stelle in CSS-Pixeln.
+
+Desktop lädt beim Seitenaufbau jetzt **kein einziges Bild von einem fremden
+Ursprung** mehr.
+
 ### Nicht behoben, mit Begründung
 
 - **`text-navy/45` bis `/60` auf Weiß** (Kontaktlabels, Bildunterschriften,
