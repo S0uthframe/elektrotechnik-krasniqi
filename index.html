@@ -11,6 +11,27 @@
     <meta property="og:type" content="website" />
     <meta name="robots" content="index, follow" />
     <title>Elektriker Alteglofsheim | Elektrotechnik Krasniqi</title>
+
+    <!-- Die Bilder liegen auf einem fremden Ursprung. Ohne diesen Hinweis
+         beginnt der Browser mit DNS, TLS und Verbindungsaufbau erst, wenn das
+         JavaScript das erste <img> erzeugt hat — gemessen rund 300 ms. -->
+    <link rel="preconnect" href="https://media.base44.com" crossorigin />
+
+    <!-- Die Schrift liegt auf dem eigenen Server; preload holt sie parallel
+         zum Stylesheet statt danach. -->
+    <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Das Hero-Bild ist das groesste sichtbare Element und bestimmt damit den
+         LCP. In einer Single-Page-Anwendung steht es erst im DOM, wenn das
+         JavaScript geladen, ausgewertet und ausgefuehrt ist — der Browser kann
+         es vorher nicht finden. Diese beiden Zeilen machen es im urspruenglichen
+         Dokument sichtbar. Die Adressen entsprechen exakt denen, die
+         HeroScroll.jsx anfordert (src/lib/cdn-image.js); weicht hier etwas ab,
+         laedt die Datei zweimal. -->
+    <link rel="preload" as="image" fetchpriority="high" media="(min-width: 1024px)"
+          href="https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/ca03c90ed_Codex-Bild21Sept202614_43_58.png/v1/fit/w_1920,h_1920,q_85,usm_0.66_1.00_0.01,enc_webp,quality_auto/ca03c90ed_Codex-Bild21Sept202614_43_58.webp" />
+    <link rel="preload" as="image" fetchpriority="high" media="(max-width: 1023px)"
+          href="https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/02b490829_hell-mobile.png/v1/fit/w_1200,h_1200,q_85,usm_0.66_1.00_0.01,enc_webp,quality_auto/02b490829_hell-mobile.webp" />
   </head>
   <body>
     <div id="root"></div>

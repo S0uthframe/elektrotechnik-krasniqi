@@ -84,28 +84,28 @@ export default function ContactForm() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <Field label={t.contact.name} error={errors.name} required>
+        <Field id="kontakt-name" label={t.contact.name} error={errors.name} required>
           <input value={form.name} onChange={(e) => set("name", e.target.value)} className={`${inputBase} ${errors.name ? errBorder : okBorder}`} autoComplete="name" />
         </Field>
-        <Field label={t.contact.email} error={errors.email} required>
+        <Field id="kontakt-email" label={t.contact.email} error={errors.email} required>
           <input type="email" value={form.email} onChange={(e) => set("email", e.target.value)} className={`${inputBase} ${errors.email ? errBorder : okBorder}`} autoComplete="email" />
         </Field>
-        <Field label={t.contact.phone}>
+        <Field id="kontakt-telefon" label={t.contact.phone}>
           <input type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} className={`${inputBase} ${okBorder}`} autoComplete="tel" />
         </Field>
-        <Field label={t.contact.location} error={errors.location} required>
+        <Field id="kontakt-ort" label={t.contact.location} error={errors.location} required>
           <input value={form.location} onChange={(e) => set("location", e.target.value)} className={`${inputBase} ${errors.location ? errBorder : okBorder}`} />
         </Field>
       </div>
 
-      <Field label={t.contact.service} error={errors.service} required>
+      <Field id="kontakt-leistung" label={t.contact.service} error={errors.service} required>
         <select value={form.service} onChange={(e) => set("service", e.target.value)} className={`${inputBase} ${errors.service ? errBorder : okBorder}`}>
           <option value="">{t.contact.selectService}</option>
           {SERVICE_KEYS.map((k) => <option key={k} value={t.services.items[k].title}>{t.services.items[k].title}</option>)}
         </select>
       </Field>
 
-      <Field label={t.contact.message} error={errors.message} required>
+      <Field id="kontakt-nachricht" label={t.contact.message} error={errors.message} required>
         <textarea value={form.message} onChange={(e) => set("message", e.target.value)} rows={5} className={`${inputBase} ${errors.message ? errBorder : okBorder} resize-y`} />
       </Field>
 
@@ -132,14 +132,29 @@ export default function ContactForm() {
   );
 }
 
-function Field({ label, error, required, children }) {
+// Label und Eingabefeld standen nur nebeneinander, ohne Verbindung: Screenreader
+// lesen das Feld dann ohne Bezeichnung vor, und ein Klick aufs Label setzt den
+// Cursor nicht. Das Label zeigt jetzt per htmlFor auf die id, die das Feld hier
+// erhaelt — zusaetzlich wird eine Fehlermeldung ueber aria-describedby
+// angekuendigt und das Feld als fehlerhaft markiert.
+function Field({ id, label, error, required, children }) {
+  const errorId = error ? `${id}-fehler` : undefined;
+  const control = React.isValidElement(children)
+    ? React.cloneElement(children, {
+        id,
+        "aria-describedby": errorId,
+        "aria-invalid": error ? true : undefined,
+        required: required || undefined,
+      })
+    : children;
+
   return (
     <div>
-      <label className="block text-[12px] font-semibold tracking-wide text-navy/60 mb-2">
+      <label htmlFor={id} className="block text-[12px] font-semibold tracking-wide text-navy/60 mb-2">
         {label}{required && <span className="text-brand"> *</span>}
       </label>
-      {children}
-      {error && <p className="mt-1.5 text-[12px] text-red-500">{error}</p>}
+      {control}
+      {error && <p id={errorId} className="mt-1.5 text-[12px] text-red-500">{error}</p>}
     </div>
   );
 }

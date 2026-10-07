@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { Phone, ChevronDown } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { cdnSrc, onCdnError } from "@/lib/cdn-image";
 import HeroCtaButton from "@/components/HeroCtaButton";
 
 const HERO_DESKTOP = "https://media.base44.com/images/public/6ab1017905a6126f39abd0a8/ca03c90ed_Codex-Bild21Sept202614_43_58.png";
@@ -98,13 +99,17 @@ export default function HeroScroll() {
           <div className="absolute top-20 inset-x-0 bottom-0 overflow-hidden">
             {/* Bright base image */}
             <img
-              src={HERO_DESKTOP}
+              src={cdnSrc(HERO_DESKTOP, 1920)}
+              onError={onCdnError(HERO_DESKTOP)}
               alt={t.hero.visualNote}
+              fetchPriority="high"
+              decoding="async"
               className="absolute inset-0 h-full w-full object-cover object-top"
             />
             {/* Dark copy on top — clipped away from bottom up as you scroll */}
             <motion.img
-              src={DARK_DESKTOP}
+              src={cdnSrc(DARK_DESKTOP, 1920)}
+              onError={onCdnError(DARK_DESKTOP)}
               alt=""
               aria-hidden="true"
               className="absolute inset-0 h-full w-full object-cover object-top"
@@ -146,13 +151,17 @@ export default function HeroScroll() {
             <div className="relative h-[40svh] min-h-[220px] max-h-[300px] overflow-hidden">
               {/* Bright base image */}
               <img
-                src={BRIGHT_MOBILE}
+                src={cdnSrc(BRIGHT_MOBILE, 1200)}
+                onError={onCdnError(BRIGHT_MOBILE)}
                 alt={t.hero.visualNote}
+                fetchPriority="high"
+                decoding="async"
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
               {/* Dark copy on top — clipped away from bottom up as you scroll */}
               <motion.img
-                src={BRIGHT_MOBILE}
+                src={cdnSrc(BRIGHT_MOBILE, 1200)}
+                onError={onCdnError(BRIGHT_MOBILE)}
                 alt=""
                 aria-hidden="true"
                 className="absolute inset-0 h-full w-full object-cover object-center"

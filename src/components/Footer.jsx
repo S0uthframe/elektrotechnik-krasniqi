@@ -44,7 +44,7 @@ export default function Footer() {
           </div>
 
           <div className="md:col-span-4">
-            <p className="text-[11px] font-semibold tracking-wider text-white/40">{t.footer.nav}</p>
+            <p className="text-[11px] font-semibold tracking-wider text-white/60">{t.footer.nav}</p>
             <ul className="mt-4 grid grid-cols-2 gap-y-2.5">
               {navItems.map((item) => (
                 <li key={item.id}><a href={`${home}#${item.id}`} className="text-[14px] text-white/75 hover:text-white">{item.label}</a></li>
@@ -53,7 +53,7 @@ export default function Footer() {
           </div>
 
           <div className="md:col-span-3">
-            <p className="text-[11px] font-semibold tracking-wider text-white/40">{t.footer.legal}</p>
+            <p className="text-[11px] font-semibold tracking-wider text-white/60">{t.footer.legal}</p>
             <ul className="mt-4 space-y-2.5">
               <li><Link to={`${home}/${imprintSlug}`} className="text-[14px] text-white/75 hover:text-white">{t.footer.imprint}</Link></li>
               <li><Link to={`${home}/${privacySlug}`} className="text-[14px] text-white/75 hover:text-white">{t.footer.privacy}</Link></li>
@@ -62,8 +62,8 @@ export default function Footer() {
         </div>
 
         <div className="mt-14 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <p className="text-[12px] text-white/40">© {new Date().getFullYear()} Elektrotechnik Krasniqi</p>
-          <p className="text-[12px] text-white/40">{t.footer.designNote}</p>
+          <p className="text-[12px] text-white/60">© {new Date().getFullYear()} Elektrotechnik Krasniqi</p>
+          <p className="text-[12px] text-white/60">{t.footer.designNote}</p>
         </div>
       </div>
     </footer>

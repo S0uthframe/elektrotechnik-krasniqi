@@ -1,10 +1,61 @@
+# ─────────────────────────────────────────────────────────────
+# Weiterleitung der Client-Routen
+# ─────────────────────────────────────────────────────────────
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /
+
   # Vorhandene Dateien und Verzeichnisse (inkl. /api/contact.php) direkt ausliefern
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
+
+  # Anfragen nach Dateien, die es nicht gibt, sollen 404 sein und nicht die
+  # Seite zurueckgeben. Vorher bekam ein Abruf von /llms.txt oder
+  # /ai-catalog.json die index.html mit Status 200 — Prueftools melden dann
+  # "kaputte Datei" statt "nicht vorhanden", und Suchmaschinen sehen zu jeder
+  # beliebigen Adresse eine gueltige Seite.
+  RewriteRule \.(txt|json|xml|map|css|js|png|jpe?g|gif|svg|webp|avif|ico|woff2?|ttf|eot|mp4|webm|pdf|zip)$ - [L,R=404]
+
   # Alles andere an die SPA
   RewriteRule ^ index.html [L]
+</IfModule>
+
+# ─────────────────────────────────────────────────────────────
+# Zwischenspeicher
+# ─────────────────────────────────────────────────────────────
+# Die Dateien in /assets tragen einen Inhalts-Hash im Namen: aendert sich der
+# Inhalt, aendert sich der Name. Sie koennen deshalb dauerhaft gespeichert
+# werden. Die index.html darf das nicht — sie verweist auf die jeweils
+# aktuellen Hash-Namen und muss bei jedem Besuch neu geprueft werden.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2|svg|png|jpe?g|webp|avif|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(html|php)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "^\.ht">
+    Header set Cache-Control "no-store"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType image/svg+xml "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 year"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# ─────────────────────────────────────────────────────────────
+# Kompression
+# ─────────────────────────────────────────────────────────────
+# woff2 ist bereits komprimiert und wird bewusst ausgelassen.
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml
+  AddOutputFilterByType DEFLATE application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml
 </IfModule>

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { cdnSrc, onCdnError } from "@/lib/cdn-image";
 
 const ROUTE_MAP_DE_EN = {
   "leistungen": "services",
@@ -87,7 +88,7 @@ export default function Header() {
   const subColor = overDark ? "text-navy/80" : "text-white/80";
   const hoverColor = overDark ? "hover:text-navy" : "hover:text-white";
   const langActive = overDark ? "text-navy" : "text-white";
-  const langInactive = overDark ? "text-navy/50 hover:text-navy" : "text-white/50 hover:text-white";
+  const langInactive = overDark ? "text-navy/65 hover:text-navy" : "text-white/50 hover:text-white";
   const langSep = overDark ? "text-navy/30" : "text-white/30";
   const menuIcon = overDark ? "text-navy" : "text-white";
   const logoSrc = overDark ? LOGO_BLUE : LOGO_WHITE;
@@ -101,7 +102,7 @@ export default function Header() {
       <div className="mx-auto max-w-[1400px] px-5 sm:px-8 h-full">
         <div className="flex items-center justify-between h-full">
           <Link to={home} className="flex items-center gap-2.5 group" aria-label="Elektrotechnik Krasniqi">
-            <img src={logoSrc} alt="" className="h-9 w-auto" />
+            <img src={cdnSrc(logoSrc, 320)} onError={onCdnError(logoSrc)} alt="" width="122" height="63" className="h-9 w-auto" />
             <span className={`font-heading font-semibold text-[15px] tracking-tight ${textColor}`}>Elektrotechnik Krasniqi</span>
           </Link>
 

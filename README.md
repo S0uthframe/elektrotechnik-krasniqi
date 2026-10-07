@@ -92,6 +92,52 @@ Behoben ist das in wenigen Zeilen, sobald es gewünscht ist.
 
 ## Korrigiert gegenüber der Vorlage
 
+**Befunde aus dem PageSpeed-Test auf southframe-test.de.** Die Seite übertrug
+17,7 MB. Ursachen und Behebung:
+
+| Befund | Ursache | Behebung |
+|---|---|---|
+| Video zweimal geladen, 15,0 MB | Das Laufband verdoppelt seine Inhalte für den nahtlosen Umlauf. Zwei `<video autoplay>` auf dieselbe Adresse starteten gleichzeitig, bevor eine im Cache lag. | Video lädt erst bei Sichtkontakt (`preload="none"` + IntersectionObserver); die zweite Fassung bekommt ihre Adresse erst, wenn die erste geladen ist. |
+| Hero-Bild 1,84 MB PNG | Nacktes `<img>` auf die Originaldatei, an der Bildpipeline vorbei. | Über `src/lib/cdn-image.js` als WebP in Anzeigegröße. |
+| Logo 510 KB für 122×63 px | Dasselbe: Originaldatei 1748×900 unverändert geladen. | Ebenso, plus `width`/`height` gegen Layoutsprünge. |
+| LCP-Bild für den Browser unauffindbar | In einer SPA entsteht das `<img>` erst nach dem JavaScript. | `<link rel="preload" as="image" fetchpriority="high">` in `index.html`, nach Breakpoint getrennt. |
+| Google Fonts blockiert 780 ms | Kette aus Stylesheet und Schriftdatei über zwei fremde Ursprünge. | Inter liegt unter `public/fonts/` (latin + latin-ext, variabel), `@font-face` in `index.css`, Preload im Dokument. |
+| Keine Vorverbindung zum Bild-CDN | — | `<link rel="preconnect">` auf `media.base44.com`. |
+| Cache-TTL „None" | — | `.htaccess` setzt ein Jahr `immutable` für die gehashten Dateien, `no-cache` für `index.html`. |
+| Formularfelder ohne Label-Bezug | `<label>` und Feld standen nur nebeneinander. | `htmlFor`/`id` pro Feld, dazu `aria-describedby` und `aria-invalid` für Fehlermeldungen. |
+| Kontrast in der Fußzeile zu gering | `text-white/40` auf Navy ergibt 3,75:1, verlangt sind 4,5:1. | `text-white/60` (6,72:1). Dazu `text-navy/50` in der Sprachumschaltung (3,30:1) auf `text-navy/65` (5,34:1). |
+| `llms.txt` und `ai-catalog.json` „ungültig" | Die SPA-Weiterleitung gab für jede unbekannte Adresse die `index.html` mit Status 200 zurück. Prüfwerkzeuge lasen HTML, wo JSON erwartet wurde. | `.htaccess` beantwortet fehlende Dateien mit Dateiendung jetzt mit 404. Die Dateien selbst werden bewusst nicht angelegt — siehe unten. |
+
+Die umgewandelten Bildadressen konnten von der Entwicklungsumgebung aus nicht
+geprüft werden: `media.base44.com` ist dort netzseitig gesperrt. Schlägt eine
+Umwandlung fehl, lädt `onCdnError` die Originaldatei nach — schlimmstenfalls
+bleibt es also beim bisherigen Zustand, ein Bild fehlt nicht. Der erste Test
+auf dem Server zeigt es an der Dateigröße des Hero-Bildes.
+
+### Nicht behoben, mit Begründung
+
+- **`text-navy/45` bis `/60` auf Weiß** (Kontaktlabels, Bildunterschriften,
+  Fußnoten) liegen mit 2,87:1 bis 4,48:1 ebenfalls unter 4,5:1. PageSpeed hat
+  sie nicht gemeldet, weil nur die Fußzeile in die Stichprobe kam. Die Korrektur
+  wären rund zehn Klassenänderungen, die das zurückhaltende Grau der Vorlage
+  sichtbar verändern — das ist eine Gestaltungsentscheidung, keine rein
+  technische.
+- **Fehlende `width`/`height` an den Laufband-Bildern.** Die Maße der
+  Originaldateien sind von hier nicht abrufbar; geratene Werte würden die
+  Bilder verzerren.
+- **42 KB ungenutztes JavaScript.** Aufteilbar, indem `framer-motion` nur für
+  den Hero nachgeladen wird. Das verzögert aber genau die Animation, die als
+  erstes sichtbar ist.
+- **`llms.txt`.** Google unterstützt die Datei nach eigener Aussage nicht, kein
+  großer Anbieter hat produktive Nutzung zugesagt. Eine Datei anzulegen, damit
+  ein Prüfwerkzeug grün wird, ist kein Grund. Der eigentliche Fehler — HTML mit
+  Status 200 auf eine nicht vorhandene Datei — ist behoben.
+- **Weiche 404.** Unbekannte Adressen ohne Dateiendung liefern weiterhin die
+  Startseite mit Status 200, die dann die 404-Seite anzeigt. Ein echter
+  Statuscode 404 verlangt serverseitiges Rendern; das ist eine
+  Architekturentscheidung, keine Einstellung.
+
+
 **Doppeltes `<h1>` auf der Startseite.** Der Hero hatte zwei vollständige
 Fassungen dauerhaft im DOM — eine für Desktop, eine für Mobil —, von denen CSS
 jeweils eine ausblendete. Für Suchmaschinen standen damit zwei `<h1>` auf der
