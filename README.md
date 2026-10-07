@@ -125,6 +125,35 @@ auf dem Server zeigt es an der Dateigröße des Hero-Bildes.
 | Vorverbindung „nicht verwendet" | `crossorigin` entfernt. Die Bilder werden ohne CORS geladen; mit dem Attribut öffnet der Browser einen zweiten, ungenutzten Verbindungskanal. |
 | Dunkles Hero-Bild bei abgeschalteter Animation | Wird gar nicht mehr angefordert — sichtbar ist es in diesem Fall nie. |
 
+**Dritter Durchgang — die Hero-Fläche blieb beim Laden leer.** Die
+LCP-Aufschlüsselung nannte 3.750 ms allein für den Download der Bilddatei. Die
+Quelldateien sind rauschreiche 3D-Renderings und lassen sich schlecht
+komprimieren: 579 KB als WebP bei `w_960,q_75`. Drei Hebel:
+
+1. **Sofortbild.** Eine 48 Pixel breite Fassung (rund 1 KB), unscharf
+   hochskaliert, füllt die Fläche, bis das richtige Bild steht. Dieselbe
+   Technik, die die Bildkomponente der Vorlage an anderen Stellen bereits
+   verwendet.
+2. **Ohne Umweg über JavaScript.** Das Sofortbild der Komponente wird erst
+   gezeichnet, wenn 120 KB JavaScript geladen und ausgeführt sind. Deshalb
+   steht derselbe Platzhalter zusätzlich direkt in `index.html` — als
+   `#hero-platzhalter` mit eigenem `<style>`. Er erscheint, sobald das Dokument
+   da ist, und wird von React beim ersten Rendern ersetzt; dahinter steht das
+   gleich aufgebaute Sofortbild der Komponente, also kein sichtbarer Wechsel.
+3. **Getrennte Qualitätsstufen.** Auf dem Handy ist die dunkle Ebene dieselbe
+   Datei, nur per CSS auf 34 % Helligkeit gedimmt — Kompressionsartefakte sieht
+   dort niemand. Sie bekommt deshalb eine eigene, stark komprimierte Fassung
+   (`q_38`) und ist als LCP-Element das, was zählt. Die helle Ebene (`q_62`)
+   lädt danach; sichtbar wird sie ohnehin erst beim Scrollen. Die Stufen stehen
+   gesammelt am Kopf von `HeroScroll.jsx`.
+
+Dazu: Das Stylesheet wird beim Bauen in die `index.html` eingebettet
+(`tools/css-einbetten.mjs`) — es blockierte das erste Rendering um 180 ms, nicht
+wegen seiner Größe, sondern weil es ein zusätzlicher Netzabruf ist. Der Schritt
+bricht ab, wenn das CSS über 60 KB wächst. Die Vorverbindung zu
+`media.base44.com` ist entfallen: Die Preloads öffnen die Verbindung bereits
+selbst, der Hinweis blieb im Bericht ungenutzt.
+
 ### Nicht behoben, mit Begründung
 
 - **`text-navy/45` bis `/60` auf Weiß** (Kontaktlabels, Bildunterschriften,
@@ -136,6 +165,11 @@ auf dem Server zeigt es an der Dateigröße des Hero-Bildes.
 - **Fehlende `width`/`height` an den Laufband-Bildern.** Die Maße der
   Originaldateien sind von hier nicht abrufbar; geratene Werte würden die
   Bilder verzerren.
+- **Die Quelldateien der Hero-Bilder.** Sie sind der eigentliche Engpass:
+  rauschreiche Renderings, die auch als WebP schwer bleiben. Sauber gelöst wäre
+  das mit besseren Ausgangsdateien — ein ruhigeres Motiv oder eine Fassung, die
+  für Webgrößen gerechnet ist. Alles hier Beschriebene arbeitet um diese
+  Eigenschaft herum.
 - **42 KB ungenutztes JavaScript.** Aufteilbar, indem `framer-motion` nur für
   den Hero nachgeladen wird. Das verzögert aber genau die Animation, die als
   erstes sichtbar ist.

@@ -11,6 +11,41 @@ const BRIGHT_MOBILE = "https://media.base44.com/images/public/6ab1017905a6126f39
 
 const PHONE_HREF = "tel:+491604141186";
 
+// Bildstufen. Die Quelldateien sind rauschreiche 3D-Renderings und lassen sich
+// schlecht komprimieren: 579 KB als WebP bei w_960/q_75, gemessene 3,75 s nur
+// fuer den Download — so lange blieb die Hero-Flaeche leer.
+//
+// Drei Hebel dagegen:
+// 1. SOFORT: eine 48 Pixel breite Fassung (etwa 1 KB), unscharf hochskaliert.
+//    Sie ist nach dem ersten Netzabruf da und fuellt die Flaeche, bis das
+//    richtige Bild steht. Das ist dieselbe Technik, die die Bildkomponente der
+//    Vorlage an anderen Stellen bereits verwendet.
+// 2. Die dunkle Ebene auf dem Handy ist dieselbe Datei, nur per CSS auf 34 %
+//    Helligkeit gedimmt. Kompressionsartefakte sieht dort niemand, also bekommt
+//    sie eine eigene, deutlich staerker komprimierte Fassung. Sie ist das
+//    LCP-Element — und damit das, was zaehlt.
+// 3. Die helle Ebene wird erst danach geladen; sichtbar wird sie ohnehin erst
+//    beim Scrollen.
+const Q_SOFORT = { breite: 48, qualitaet: 40 };
+const Q_DUNKEL_MOBIL = { breite: 900, qualitaet: 38 };
+const Q_HELL_MOBIL = { breite: 900, qualitaet: 62 };
+const Q_DUNKEL_DESKTOP = { breite: 1600, qualitaet: 60 };
+const Q_HELL_DESKTOP = { breite: 1600, qualitaet: 75 };
+
+// Unscharfes Sofortbild. aria-hidden, weil es nur eine Vorstufe desselben
+// Motivs ist und Screenreadern nichts Zusaetzliches sagt.
+function Sofortbild({ src, position }) {
+  return (
+    <img
+      src={cdnSrc(src, Q_SOFORT.breite, Q_SOFORT.qualitaet)}
+      alt=""
+      aria-hidden="true"
+      className={`absolute inset-0 h-full w-full object-cover ${position}`}
+      style={{ filter: "blur(16px)", transform: "scale(1.08)" }}
+    />
+  );
+}
+
 // Desktop- und Mobilfassung des Heros standen beide dauerhaft im DOM; CSS hat
 // nur eine davon ausgeblendet. Damit lagen zwei <h1> auf der Seite und beide
 // Hero-Bilder wurden geladen. Die Mediaquery entscheidet jetzt, welche Fassung
@@ -107,10 +142,11 @@ export default function HeroScroll() {
         <div className="relative h-full">
           {/* Image area starts below the header so the full roofline stays visible */}
           <div className="absolute top-20 inset-x-0 bottom-0 overflow-hidden">
+            <Sofortbild src={showDark ? DARK_DESKTOP : HERO_DESKTOP} position="object-top" />
             {/* Bright base image — erst nach dem dunklen, damit es nicht aufblitzt */}
             {(!showDark || darkLoaded) && (
               <img
-                src={cdnSrc(HERO_DESKTOP, 1600)}
+                src={cdnSrc(HERO_DESKTOP, Q_HELL_DESKTOP.breite, Q_HELL_DESKTOP.qualitaet)}
                 onError={onCdnError(HERO_DESKTOP)}
                 alt={t.hero.visualNote}
                 fetchPriority={showDark ? "low" : "high"}
@@ -121,7 +157,7 @@ export default function HeroScroll() {
             {/* Dark copy on top — clipped away from bottom up as you scroll */}
             {showDark && (
               <motion.img
-                src={cdnSrc(DARK_DESKTOP, 1600)}
+                src={cdnSrc(DARK_DESKTOP, Q_DUNKEL_DESKTOP.breite, Q_DUNKEL_DESKTOP.qualitaet)}
                 onError={(event) => {
                   // Erster Fehlschlag: auf die Originaldatei zurueckfallen.
                   // Scheitert auch die, das helle Bild trotzdem freigeben —
@@ -173,24 +209,36 @@ export default function HeroScroll() {
           <div className="pt-20">
             {/* Building image — own area, not a background */}
             <div className="relative h-[40svh] min-h-[220px] max-h-[300px] overflow-hidden">
-              {/* Bright base image */}
-              <img
-                src={cdnSrc(BRIGHT_MOBILE, 960, 75)}
-                onError={onCdnError(BRIGHT_MOBILE)}
-                alt={t.hero.visualNote}
-                fetchPriority="high"
-                decoding="async"
-                className="absolute inset-0 h-full w-full object-cover object-center"
-              />
+              <Sofortbild src={BRIGHT_MOBILE} position="object-center" />
+              {/* Bright base image — erst nach der dunklen Ebene */}
+              {(!showDark || darkLoaded) && (
+                <img
+                  src={cdnSrc(BRIGHT_MOBILE, Q_HELL_MOBIL.breite, Q_HELL_MOBIL.qualitaet)}
+                  onError={onCdnError(BRIGHT_MOBILE)}
+                  alt={t.hero.visualNote}
+                  fetchPriority={showDark ? "low" : "high"}
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover object-center"
+                />
+              )}
               {/* Dark copy on top — clipped away from bottom up as you scroll */}
-              <motion.img
-                src={cdnSrc(BRIGHT_MOBILE, 960, 75)}
-                onError={onCdnError(BRIGHT_MOBILE)}
-                alt=""
-                aria-hidden="true"
-                className="absolute inset-0 h-full w-full object-cover object-center"
-                style={{ filter: "brightness(0.34) saturate(0.85)", clipPath: reduce ? "inset(100% 0% 0% 0%)" : clip, WebkitClipPath: reduce ? "inset(100% 0% 0% 0%)" : clip }}
-              />
+              {showDark && (
+                <motion.img
+                  src={cdnSrc(BRIGHT_MOBILE, Q_DUNKEL_MOBIL.breite, Q_DUNKEL_MOBIL.qualitaet)}
+                  onError={(event) => {
+                    const vorher = event.currentTarget.src;
+                    onCdnError(BRIGHT_MOBILE)(event);
+                    if (event.currentTarget.src === vorher) setDarkLoaded(true);
+                  }}
+                  onLoad={() => setDarkLoaded(true)}
+                  alt=""
+                  aria-hidden="true"
+                  fetchPriority="high"
+                  decoding="async"
+                  className="absolute inset-0 h-full w-full object-cover object-center"
+                  style={{ filter: "brightness(0.34) saturate(0.85)", clipPath: clip, WebkitClipPath: clip }}
+                />
+              )}
               {/* Fade into the navy text area below */}
               <div className="absolute inset-x-0 bottom-0 h-16 pointer-events-none" style={{ background: "linear-gradient(to top, rgba(8,31,48,0.95), transparent)" }} />
             </div>
