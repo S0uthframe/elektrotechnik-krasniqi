@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 205 64% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 205 64% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 205 64% 11%;
+    --primary: 205 64% 11%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 205 64% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 205 25% 40%;
+    --accent: 215 56% 67%;
+    --accent-foreground: 205 64% 11%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 30% 90%;
+    --input: 210 30% 90%;
+    --ring: 205 90% 32%;
+    --radius: 0.25rem;
+    /* Brand palette */
+    --navy: #081F30;
+    --brand: #07527D;
+    --accent-blue: #80A1D8;
+    --font-heading: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+
+  .dark {
+    --background: 205 64% 11%;
+    --foreground: 0 0% 98%;
+    --card: 205 64% 11%;
+    --card-foreground: 0 0% 98%;
+    --popover: 205 64% 11%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 205 64% 11%;
+    --secondary: 205 40% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 205 40% 18%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 205 40% 18%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 205 40% 22%;
+    --input: 205 40% 22%;
+    --ring: 215 56% 67%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+
+  :focus-visible {
+    outline: 3px solid #80A1D8;
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  .text-navy { color: #081F30; }
+  .bg-navy { background-color: #081F30; }
+  .text-brand { color: #07527D; }
+  .bg-brand { background-color: #07527D; }
+  .text-accent-blue { color: #80A1D8; }
+  .bg-accent-blue { background-color: #80A1D8; }
+  .border-brand { border-color: #07527D; }
+  .hairline { border-color: rgba(8,31,48,0.12); }
+  .hairline-light { border-color: rgba(255,255,255,0.14); }
+}
+
+@property --mb-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes mb-spin {
+  to { --mb-angle: 360deg; }
+}
+
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee-scroll 60s linear infinite;
+  will-change: transform;
+}
+
+.marquee-pause:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
+}
