@@ -34,6 +34,11 @@ export const ResponsiveImage = React.forwardRef(
               })}
               alt=""
               aria-hidden="true"
+              // Ohne das fordert jede Vorstufe ihre Datei sofort beim
+              // Seitenaufbau an — auf dem Handy acht Abrufe zum fremden CDN,
+              // waehrend das Hero-Bild laedt. Das eigentliche Bild darunter
+              // hat laengst loading="lazy"; die Vorstufe hatte es nie.
+              loading="lazy"
               className="w-full h-full inset-0 absolute"
               style={{
                 objectFit: fittingType === "fit" ? "contain" : "cover",

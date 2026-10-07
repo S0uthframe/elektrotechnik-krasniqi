@@ -187,6 +187,22 @@ hinterlassen hätte. Die blaue Fassung trägt die Farbe, die in der Datei steht
 (`#014378`), nicht eine geschätzte. Geprüft wurde nicht nach Augenmaß, sondern
 am gerenderten Pixelwert.
 
+**Fünfter Durchgang — Desktop 100, Mobil 79.** Barrierefreiheit, Best
+Practices, SEO und agentische Bereitschaft stehen auf voll; die Leistung hängt
+allein am Largest Contentful Paint (4,7 s bei einem First Contentful Paint von
+1,7 s).
+
+Gefunden und behoben: Die unscharfe Vorstufe in `ui/responsive-image.jsx`
+hatte kein `loading="lazy"` — anders als das eigentliche Bild darunter. Dadurch
+forderten die acht Bilder der Leistungsliste ihre Vorstufe sofort beim
+Seitenaufbau an: acht Abrufe zu einem fremden Ursprung, während das Hero-Bild
+lädt. Auf einer gedrosselten Mobilverbindung kostet jeder davon eine
+Umlaufzeit. Nachgemessen: vorher elf CDN-Abrufe beim Seitenaufbau, jetzt drei.
+
+Das entscheidende Element bleibt aber das mobile Hero-Bild, das als einziges
+noch am CDN hängt. Solange seine Originaldatei fehlt, ist der Wert nicht
+weiter zu drücken.
+
 ### Nicht behoben, mit Begründung
 
 - **`text-navy/45` bis `/60` auf Weiß** (Kontaktlabels, Bildunterschriften,
