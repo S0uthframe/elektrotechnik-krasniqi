@@ -81,18 +81,34 @@ Caddy ist die Regel entsprechend nachzubilden (`try_files $uri /index.html`).
    `srcset`. Ein Ersatz dafür ist Teil der Migration, nicht dieses Nachbaus.
 2. **`public/favicon.svg` ist ein Platzhalter** in den Markenfarben. Das
    Original liegt auf der Base44-Plattform und war von hier nicht abrufbar.
-3. **Zwei `<h1>` auf der Startseite** (aus der Vorlage übernommen: der Hero
-   rendert eine Mobil- und eine Desktop-Variante). Für die Suche ist das ein
-   Mangel; die saubere Lösung ist, eine Variante per CSS auszublenden statt
-   sie doppelt in den DOM zu schreiben.
-4. **Fehler in `localizedPath` (`src/components/Layout.jsx`, aus der Vorlage).**
+3. **Fehler in `localizedPath` (`src/components/Layout.jsx`, aus der Vorlage).**
    Die Übersetzung des Slugs richtet sich nach der *aktuellen*, nicht nach der
    *Ziel*-Sprache. Auf `/de/impressum` zeigt deshalb `hreflang="de"` auf
    `/de/imprint` — eine Seite, die es nicht gibt. Betroffen sind alle
    deutschen Unterseiten.
 
-Punkt 3 und 4 sind absichtlich nicht korrigiert: Der Auftrag war ein
-1:1-Nachbau. Beides ist in wenigen Zeilen behoben, sobald es gewünscht ist.
+Punkt 3 ist absichtlich nicht korrigiert: Der Auftrag war ein 1:1-Nachbau.
+Behoben ist das in wenigen Zeilen, sobald es gewünscht ist.
+
+## Korrigiert gegenüber der Vorlage
+
+**Doppeltes `<h1>` auf der Startseite.** Der Hero hatte zwei vollständige
+Fassungen dauerhaft im DOM — eine für Desktop, eine für Mobil —, von denen CSS
+jeweils eine ausblendete. Für Suchmaschinen standen damit zwei `<h1>` auf der
+Seite, und beide Hero-Bilder wurden geladen, obwohl immer nur eines sichtbar
+ist. `HeroScroll.jsx` entscheidet jetzt per `matchMedia` (`min-width: 1024px`),
+welche Fassung überhaupt gerendert wird.
+
+Der Startwert wird synchron aus `window.matchMedia` gelesen, nicht erst in
+einem Effekt — sonst würde beim ersten Bild kurz die falsche Fassung stehen.
+Ein `change`-Listener hält den Wechsel beim Verändern der Fensterbreite
+nach. Geprüft bei 1440, 900 und 390 px sowie beim Umschalten ohne Neuladen:
+jeweils genau ein sichtbares `<h1>`, keine Konsolenfehler.
+
+Die per CSS ausgeblendete Fassung einfach zu einem `<p>` zu machen, wäre der
+kürzere Weg gewesen — aber ein schlechterer: Auf Mobilgeräten hätte die Seite
+dann gar keine Überschrift erster Ordnung mehr gehabt, was Screenreader-Nutzern
+die Orientierung nimmt (WCAG 1.3.1).
 
 ## Herkunft
 

@@ -10,6 +10,27 @@ const BRIGHT_MOBILE = "https://media.base44.com/images/public/6ab1017905a6126f39
 
 const PHONE_HREF = "tel:+491604141186";
 
+// Desktop- und Mobilfassung des Heros standen beide dauerhaft im DOM; CSS hat
+// nur eine davon ausgeblendet. Damit lagen zwei <h1> auf der Seite und beide
+// Hero-Bilder wurden geladen. Die Mediaquery entscheidet jetzt, welche Fassung
+// ueberhaupt gerendert wird. Der Startwert wird synchron gelesen, es gibt also
+// kein Umspringen beim ersten Bild.
+const DESKTOP_QUERY = "(min-width: 1024px)";
+
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(
+    () => typeof window !== "undefined" && window.matchMedia(DESKTOP_QUERY).matches
+  );
+  useEffect(() => {
+    const mql = window.matchMedia(DESKTOP_QUERY);
+    const onChange = (event) => setIsDesktop(event.matches);
+    setIsDesktop(mql.matches);
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+  return isDesktop;
+}
+
 // Pinned scroll reveal: a dark copy of the image lies over the bright one.
 // As the user scrolls, the dark copy is clipped away from the bottom up,
 // revealing the bright image. The hero stays pinned during the reveal; once
@@ -18,6 +39,7 @@ const PHONE_HREF = "tel:+491604141186";
 export default function HeroScroll() {
   const { t } = useI18n();
   const reduce = useReducedMotion();
+  const isDesktop = useIsDesktop();
   const sectionRef = useRef(null);
   const [glowSignal, setGlowSignal] = useState(0);
   const [borderEnabled, setBorderEnabled] = useState(false);
@@ -70,7 +92,8 @@ export default function HeroScroll() {
     <section ref={sectionRef} className="relative bg-navy h-[170vh]">
       <div className="sticky top-0 h-screen overflow-hidden">
         {/* ===== Desktop (lg+): full-bleed image, text overlay on left negative space ===== */}
-        <div className="hidden lg:block relative h-full">
+        {isDesktop && (
+        <div className="relative h-full">
           {/* Image area starts below the header so the full roofline stays visible */}
           <div className="absolute top-20 inset-x-0 bottom-0 overflow-hidden">
             {/* Bright base image */}
@@ -113,8 +136,11 @@ export default function HeroScroll() {
           </div>
         </div>
 
+        )}
+
         {/* ===== Mobile / tablet: stacked — image, headline, short desc, call button ===== */}
-        <div className="lg:hidden relative h-full">
+        {!isDesktop && (
+        <div className="relative h-full">
           <div className="pt-20">
             {/* Building image — own area, not a background */}
             <div className="relative h-[40svh] min-h-[220px] max-h-[300px] overflow-hidden">
@@ -160,6 +186,8 @@ export default function HeroScroll() {
             </div>
           </div>
         </div>
+        )}
+
         <motion.div style={{ opacity: arrowOpacity }} className="absolute bottom-6 inset-x-0 z-20 flex justify-center pointer-events-none">
           <button
             type="button"
