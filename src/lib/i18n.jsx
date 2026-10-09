@@ -242,6 +242,8 @@ export const translations = {
       imprint: "Impressum",
       privacy: "Datenschutz",
       designNote: "Designkonzept — Illustratives Motiv",
+      agencyPrefix: "Konzept und Umsetzung:",
+      agencyName: "Southframe",
     },
     imprint: {
       title: "Impressum",
@@ -507,6 +509,8 @@ export const translations = {
       imprint: "Legal notice",
       privacy: "Privacy policy",
       designNote: "Design concept — illustrative motif",
+      agencyPrefix: "Concept and development:",
+      agencyName: "Southframe",
     },
     imprint: {
       title: "Imprint",

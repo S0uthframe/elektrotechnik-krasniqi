@@ -63,7 +63,23 @@ export default function Footer() {
 
         <div className="mt-14 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <p className="text-[12px] text-white/60">© {new Date().getFullYear()} Elektrotechnik Krasniqi</p>
-          <p className="text-[12px] text-white/60">{t.footer.designNote}</p>
+          {/* Hinweis auf das illustrative Motiv und der Agenturnachweis stehen
+              zusammen rechts; auf schmalen Bildschirmen untereinander, damit
+              die Zeile nicht umbricht. */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-[12px] text-white/60">
+            <span>{t.footer.designNote}</span>
+            <span aria-hidden="true" className="hidden sm:inline text-white/25">·</span>
+            <span>
+              {t.footer.agencyPrefix}{" "}
+              <a
+                href="https://www.southframe.de/"
+                rel="noopener"
+                className="text-white/75 underline underline-offset-2 decoration-white/30 hover:text-white hover:decoration-white/70 transition-colors"
+              >
+                {t.footer.agencyName}
+              </a>
+            </span>
+          </div>
         </div>
       </div>
     </footer>
