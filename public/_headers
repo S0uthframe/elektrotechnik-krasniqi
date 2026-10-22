@@ -1,0 +1,20 @@
+# Cloudflare Pages — Gegenstueck zum Header-Teil der .htaccess.
+#
+# Reihenfolge zaehlt: spaetere Regeln ueberschreiben fruehere fuer denselben
+# Header. Deshalb steht die allgemeine Regel oben und die Ausnahmen darunter.
+
+/*
+  Cache-Control: no-cache
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# Diese Dateien tragen einen Inhalts-Hash oder aendern sich nie: aendert sich
+# der Inhalt, aendert sich der Name. Sie duerfen dauerhaft gespeichert werden.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/media/*
+  Cache-Control: public, max-age=31536000, immutable

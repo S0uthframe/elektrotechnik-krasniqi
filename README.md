@@ -64,6 +64,39 @@ Protokoll als JSONL als Ersatz für die Entity.
 
 ## Veröffentlichen
 
+### Cloudflare Pages
+
+Das Repository lässt sich direkt in Cloudflare Pages einhängen — ohne Build-Server
+und ohne FTP.
+
+| Einstellung | Wert |
+|---|---|
+| Build-Befehl | `npm run build` |
+| Ausgabeverzeichnis | `dist` |
+| Node-Version | 20 oder neuer |
+
+`public/_redirects` und `public/_headers` sind das Gegenstück zur `.htaccess`:
+Client-Routen auf `index.html`, Cache-Zeiten für die gehashten Dateien. Beide
+Dateien stören den Apache-Betrieb nicht, er ignoriert sie.
+
+**Was auf Pages fehlt: PHP.** `api/contact.php` läuft dort nicht. Das Formular
+meldet dann einen Fehler statt eines falschen Erfolgs — Telefonnummer und
+E-Mail stehen direkt darüber, der Weg zum Kontakt bleibt also offen. Für den
+Dauerbetrieb gibt es zwei Wege: den Endpunkt als Pages Function neu schreiben
+(braucht einen Maildienst, da Workers nicht selbst mailen können), oder die
+`contact.php` auf einem Server mit PHP belassen und `VITE_CONTACT_ENDPOINT`
+darauf zeigen lassen — dann sitzt der Versand dort, wo auch das Postfach liegt,
+und SPF/DMARC passen ohne Zutun.
+
+Ein bewusster Unterschied zur Apache-Fassung: Die `.htaccess` beantwortet
+fehlende Dateien mit Endung (`/llms.txt`) mit einem 404. Auf Pages greift dafür
+die Auffangregel, solche Adressen liefern also die Startseite mit Status 200.
+Für einen Übergangsbetrieb ist das hinnehmbar; dauerhaft wäre es über eine
+Pages Function zu lösen.
+
+### Klassischer Webspace (Apache)
+
+
 `dist/` auf den Webserver, `api/contact.php` nach `/api/`. `public/.htaccess`
 wird mitgebaut und leitet alle Client-Routen (`/de`, `/en/imprint` …) auf
 `index.html` — ohne diese Regel liefert der Server dort 404. Auf nginx oder

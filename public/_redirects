@@ -1,0 +1,17 @@
+# Cloudflare Pages — Gegenstück zur .htaccess (die Apache braucht, Pages ignoriert).
+#
+# Die Adressen der Seite (/de, /en/imprint …) entstehen erst im Browser; als
+# Dateien gibt es sie nicht. Ohne diese Regel liefert Pages dort einen 404.
+# Vorhandene Dateien werden vorher ausgeliefert, die Regel greift also nur
+# fuer Adressen, zu denen keine Datei existiert.
+
+# Die Apache-Konfiguration soll nicht lesbar sein, falls sie mit hochgeht.
+/.htaccess    /index.html   404
+
+# Auf Pages gibt es kein PHP. Ohne diese Regel bekaeme ein Absenden des
+# Formulars die index.html mit Status 200 zurueck — das Frontend wertet das
+# als Fehler, aber ein ehrlicher 404 ist sauberer.
+/api/*        /index.html   404
+
+# Alles Uebrige an die Anwendung.
+/*            /index.html   200
