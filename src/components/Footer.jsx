@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useI18n } from "@/lib/i18n";
+import Logo from "@/components/Logo";
 
 const SERVICE_KEYS = [
   "elektroinstallation", "smart-home", "solarinstallation",
@@ -28,12 +29,11 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
           <div className="md:col-span-5">
             <div className="flex items-center gap-2.5">
-              <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
-                <rect x="1" y="1" width="32" height="32" rx="6" fill="#FFFFFF" />
-                <path d="M8 13 L17 6 L26 13" stroke="#07527D" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M11 16 V26 M11 21 H19 M19 16 V26" stroke="#081F30" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M23 16 V26 M23 16 H27 M27 16 V26 M27 21 H23" stroke="#07527D" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              {/* Bis hierher stand eine nachgezeichnete Platzhalter-Grafik aus der
+                  Vorlage — ein Quadrat mit angedeutetem Dach, nicht die Marke.
+                  Jetzt dieselbe Vektorfassung wie in der Kopfleiste, in Weiss
+                  auf dem dunklen Grund. */}
+              <Logo className="h-8 w-auto" style={{ color: "#ffffff" }} />
               <span className="font-heading font-semibold text-[15px]">Elektrotechnik Krasniqi</span>
             </div>
             <p className="mt-5 text-[14px] leading-relaxed text-white/60 max-w-sm">{t.footer.tagline}</p>
