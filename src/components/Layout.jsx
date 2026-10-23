@@ -27,11 +27,16 @@ function setLink(id, rel, href, hreflang) {
   if (hreflang) el.setAttribute("hreflang", hreflang);
 }
 
+// Die kanonische Adresse der Seite. Fest verdrahtet und nicht aus dem Browser
+// gelesen: unter einer Testdomain oder auf www. wuerde sonst eine zweite,
+// konkurrierende Adresse als kanonisch gemeldet.
+const SEITEN_URSPRUNG = "https://elektro-krasniqi.de";
+
 export default function Layout() {
   const location = useLocation();
 
   useEffect(() => {
-    const origin = window.location.origin;
+    const origin = SEITEN_URSPRUNG;
     setLink("canonical", "canonical", origin + location.pathname);
     setLink("hreflang-de", "alternate", origin + localizedPath(location.pathname, "de"), "de");
     setLink("hreflang-en", "alternate", origin + localizedPath(location.pathname, "en"), "en");
@@ -39,7 +44,7 @@ export default function Layout() {
   }, [location.pathname]);
 
   useEffect(() => {
-    const origin = window.location.origin;
+    const origin = SEITEN_URSPRUNG;
     const ld = {
       "@context": "https://schema.org",
       "@type": "Electrician",

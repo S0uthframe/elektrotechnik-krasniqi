@@ -5,6 +5,18 @@
   RewriteEngine On
   RewriteBase /
 
+  # Eine einzige gueltige Adresse: https, ohne www. Beides zusammen in einem
+  # Sprung, damit kein Aufruf zweimal umgeleitet wird.
+  # Sollte die Seite nach dem Hochladen in einer Schleife haengen, bedeutet das,
+  # dass der Server HTTPS nicht meldet: dann diese beiden Bloecke wieder
+  # entfernen, die Seite laeuft sofort weiter.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://elektro-krasniqi.de%{REQUEST_URI} [L,R=301]
+
+  RewriteCond %{HTTP_HOST} ^www\. [NC]
+  RewriteRule ^ https://elektro-krasniqi.de%{REQUEST_URI} [L,R=301]
+
   # Vorhandene Dateien und Verzeichnisse (inkl. /api/contact.php) direkt ausliefern
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
