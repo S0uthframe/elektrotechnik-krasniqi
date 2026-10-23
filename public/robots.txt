@@ -1,0 +1,9 @@
+# Elektrotechnik Krasniqi
+# Die Seite soll vollstaendig indexiert werden. Ausgenommen ist nur der
+# Formular-Endpunkt — er liefert kein Dokument, sondern nimmt Daten entgegen.
+
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://elektro-krasniqi.de/sitemap.xml

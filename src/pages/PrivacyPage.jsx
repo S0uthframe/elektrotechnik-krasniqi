@@ -19,7 +19,11 @@ export default function PrivacyPage() {
           {t.privacy.sections.map((s, i) => (
             <section key={i}>
               <h2 className="font-heading font-semibold text-[18px] text-navy">{s.h}</h2>
-              <p className="mt-2 text-[15px] text-navy/70 leading-relaxed">{s.p}</p>
+              {/* Ein Abschnitt darf mehrere Absaetze haben. Ein Rechtstext in
+                  je einem Block je Thema ist sonst kaum lesbar. */}
+              {(Array.isArray(s.p) ? s.p : [s.p]).map((absatz, j) => (
+                <p key={j} className="mt-2 text-[15px] text-navy/70 leading-relaxed">{absatz}</p>
+              ))}
             </section>
           ))}
         </div>

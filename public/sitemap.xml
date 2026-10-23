@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Die Seite ist eine Single-Page-Anwendung: Ihre Adressen entstehen erst im
+     Browser. Ohne diese Datei findet eine Suchmaschine die Unterseiten nur
+     ueber die interne Navigation. Die hreflang-Angaben nennen je Adresse ihre
+     Entsprechung in der anderen Sprache. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://elektro-krasniqi.de/de</loc>
+    <lastmod>2026-10-23</lastmod>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://elektro-krasniqi.de/de"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://elektro-krasniqi.de/en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://elektro-krasniqi.de/de"/>
+  </url>
+  <url>
+    <loc>https://elektro-krasniqi.de/en</loc>
+    <lastmod>2026-10-23</lastmod>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="de" href="https://elektro-krasniqi.de/de"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://elektro-krasniqi.de/en"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://elektro-krasniqi.de/de"/>
+  </url>
+  <url>
+    <loc>https://elektro-krasniqi.de/de/impressum</loc>
+    <lastmod>2026-10-23</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://elektro-krasniqi.de/de/datenschutz</loc>
+    <lastmod>2026-10-23</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://elektro-krasniqi.de/en/imprint</loc>
+    <lastmod>2026-10-23</lastmod>
+    <priority>0.3</priority>
+  </url>
+  <url>
+    <loc>https://elektro-krasniqi.de/en/privacy</loc>
+    <lastmod>2026-10-23</lastmod>
+    <priority>0.3</priority>
+  </url>
+</urlset>

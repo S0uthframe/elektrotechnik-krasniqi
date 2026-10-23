@@ -7,8 +7,13 @@ import {
   parseWixMediaUrl,
 } from "./image-helpers"
 
+// Die Vorlage zeigte hier eine Platzhaltergrafik von static.wixstatic.com.
+// Das waere ein Abruf zu einem weiteren fremden Ursprung — auf einer
+// Kundenseite unerwuenscht und in der Datenschutzerklaerung anzugeben, fuer
+// einen Fall, der praktisch nie eintritt. Stattdessen ein transparentes
+// Pixel aus dem Dokument selbst.
 const FALLBACK_IMAGE_URL =
-  "https://static.wixstatic.com/media/12d367_4f26ccd17f8f4e3a8958306ea08c2332~mv2.png"
+  "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
 
 /**
  * Image with built-in Wix Media Platform support: canonical public images on
